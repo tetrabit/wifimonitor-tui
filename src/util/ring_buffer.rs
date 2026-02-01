@@ -65,4 +65,16 @@ impl<T: Clone> RingBuffer<T> {
             .map(|(i, v)| (i as f64, map_fn(v)))
             .collect()
     }
+
+    /// Like `as_dataset` but only returns the last `n` samples.
+    /// x values are 0..n (re-indexed so the window always starts at 0).
+    pub fn as_dataset_last_n<F: Fn(&T) -> f64>(&self, n: usize, map_fn: F) -> Vec<(f64, f64)> {
+        let items: Vec<&T> = self.iter().collect();
+        let skip = items.len().saturating_sub(n);
+        items[skip..]
+            .iter()
+            .enumerate()
+            .map(|(i, v)| (i as f64, map_fn(v)))
+            .collect()
+    }
 }

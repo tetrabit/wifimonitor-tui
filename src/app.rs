@@ -64,6 +64,10 @@ pub fn run(state: Arc<Mutex<AppState>>) -> std::io::Result<()> {
                             let mut st = state.lock().unwrap();
                             st.band_filter = st.band_filter.next();
                         }
+                        KeyCode::Char('t') => {
+                            let mut st = state.lock().unwrap();
+                            st.time_window = st.time_window.next();
+                        }
                         _ => {}
                     }
                 }

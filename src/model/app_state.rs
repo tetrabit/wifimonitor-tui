@@ -36,6 +36,54 @@ impl fmt::Display for BandFilter {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TimeWindow {
+    Sec5,
+    Sec10,
+    Sec15,
+    Sec30,
+    Sec60,
+}
+
+impl TimeWindow {
+    pub fn next(self) -> Self {
+        match self {
+            TimeWindow::Sec5 => TimeWindow::Sec10,
+            TimeWindow::Sec10 => TimeWindow::Sec15,
+            TimeWindow::Sec15 => TimeWindow::Sec30,
+            TimeWindow::Sec30 => TimeWindow::Sec60,
+            TimeWindow::Sec60 => TimeWindow::Sec5,
+        }
+    }
+
+    /// Number of samples this window covers (at 4 samples/sec).
+    pub fn sample_count(self) -> usize {
+        match self {
+            TimeWindow::Sec5 => 20,
+            TimeWindow::Sec10 => 40,
+            TimeWindow::Sec15 => 60,
+            TimeWindow::Sec30 => 120,
+            TimeWindow::Sec60 => 240,
+        }
+    }
+
+    pub fn seconds(self) -> u64 {
+        match self {
+            TimeWindow::Sec5 => 5,
+            TimeWindow::Sec10 => 10,
+            TimeWindow::Sec15 => 15,
+            TimeWindow::Sec30 => 30,
+            TimeWindow::Sec60 => 60,
+        }
+    }
+}
+
+impl fmt::Display for TimeWindow {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}s", self.seconds())
+    }
+}
+
 /// Shared application state between capture thread and TUI thread.
 pub struct AppState {
     /// Map of BSSID → AccessPoint.
@@ -64,6 +112,8 @@ pub struct AppState {
     pub error: Option<String>,
     /// Which band(s) the channel hopper should scan.
     pub band_filter: BandFilter,
+    /// Time window for the signal graph.
+    pub time_window: TimeWindow,
 }
 
 impl AppState {
@@ -82,6 +132,7 @@ impl AppState {
             ap_expiry_secs: 120,
             error: None,
             band_filter: BandFilter::Both,
+            time_window: TimeWindow::Sec60,
         }
     }
 
