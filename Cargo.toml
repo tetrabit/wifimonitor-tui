@@ -1,0 +1,13 @@
+[package]
+name = "wifimonitor-tui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ratatui = "0.29"
+crossterm = "0.28"
+pcap = "2"
+radiotap = "1"
+libwifi = "0.4"
+clap = { version = "4", features = ["derive"] }
+libc = "0.2"
